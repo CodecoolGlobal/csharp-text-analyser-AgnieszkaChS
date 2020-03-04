@@ -11,6 +11,7 @@ namespace Analysis
         public StatisticalAnalysis(Iterator iterator)
         {
             this.iterator = iterator;
+            CreateDictionary();
         }
 
         public int CountOf(params string[] elems)
@@ -33,19 +34,23 @@ namespace Analysis
             return count;
         }
 
-        public int DictionarySize()
+        private void CreateDictionary()
         {
-            dictionary = new List<string>();
+            this.dictionary = new List<string>();
             while (iterator.HasNext())
             {
                 var current = iterator.MoveNext();
-                if (!dictionary.Contains(current))
+                if (!this.dictionary.Contains(current))
                 {
-                    dictionary.Add(current);
+                    this.dictionary.Add(current);
                 }
             }
             iterator.Reset();
-            return dictionary.Count;
+        }
+
+        public int DictionarySize()
+        {
+            return this.dictionary.Count;
         }
 
         public int Size()
@@ -63,15 +68,47 @@ namespace Analysis
         public ISet<string> OccurMoreThan(int number)
         {
             ISet<string> setOfElements = new HashSet<string>();
-            number = number / 100;
+            float floatNumber = (float)number / 100;
+            var sumOfWords = (float)Size();
             foreach (string element in dictionary)
             {
-                if ((float)CountOf(element) / (float)Size() > number)
+                if ((float)CountOf(element) / sumOfWords > floatNumber)
                 {
                     setOfElements.Add(element);
                 }
             }
             return setOfElements;
         }
+
+        public float ShareInText(params string[] elems)
+        {
+            return (float)CountOf(elems) / (float)Size() * 100;
+        }
+
+        public float CountRatio(string first, string second)
+        {
+            return (float)CountOf(first) / (float)CountOf(second);
+        }
+
+        public Dictionary<string, int> CountElementsToDictionary(params string[] elems)
+        {
+            Dictionary<string, int> dictOfElements = new Dictionary<string, int>();
+            for (int i = 0; i < elems.Length; i++)
+            {
+                dictOfElements.Add(elems[i], CountOf(elems[i]));
+            }
+            return dictOfElements;
+        }
+
+        public Dictionary<string, float> GetShareOfElementsToDictionary(params string[] elems)
+        {
+            Dictionary<string, float> dictOfElements = new Dictionary<string, float>();
+            for (int i = 0; i < elems.Length; i++)
+            {
+                dictOfElements.Add(elems[i], ShareInText(elems[i]));
+            }
+            return dictOfElements;
+        }
+
     }
 }
